@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.7'
 	id 'io.spring.dependency-management' version '1.1.5'
+	id("com.diffplug.spotless") version "6.25.0"
 }
 
 group = 'com.example'
@@ -53,4 +54,56 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.register('installLocalGitHook', Copy) {
+	from new File(rootProject.rootDir, '.hooks/pre-commit')
+	into { new File(rootProject.rootDir, '.git/hooks') }
+	fileMode 0775
+}
+
+build.dependsOn installLocalGitHook
+
+spotless {
+	format 'misc', {
+		// define the files to apply `misc` to
+		target '*.gradle', '.gitattributes', '.gitignore', 'prettierc'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'styling', {
+		target '.vscode/**/*.json', 'src/**/*.json', 'src/**/*.yaml', 'src/**/*.yml', 'compose.yml', '.mvn/**/*.xml',
+				'src/**/*.xml'
+		prettier(['prettier': '3.3.2', '@prettier/plugin-xml': '0.10.0'])
+		.config(['printWidth': 120, 'plugins': ['@prettier/plugin-xml']]).npmInstallCache()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	java {
+		importOrder()
+		removeUnusedImports()
+		cleanthat().version('2.20').sourceCompatibility('21').addMutator('SafeAndConsensual').addMutator(
+				'SafeButNotConsensual')
+		palantirJavaFormat('2.47.0').style("PALANTIR").formatJavadoc(true)
+		formatAnnotations()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	groovyGradle {
+		greclipse()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	flexmark {
+		target '**/*.md'
+		flexmark()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	shell {
+		target 'scripts/**/*.sh'
+		shfmt()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
 }
