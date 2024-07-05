@@ -83,13 +83,10 @@ build {
 }
 
 spotless {
-	println("Spotless build.gradle")
 	String ref = project.properties["ratchetFrom"]
-	println(ref)
 	if (ref != null) {
 		ref = ref.trim()
 		if (ref.length() > 0) {
-			println("Ratcheting from $ref")
 			ratchetFrom ref
 		}
 	}
