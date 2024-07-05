@@ -59,12 +59,40 @@ tasks.named('test') {
 tasks.register('installLocalGitHook', Copy) {
 	from new File(rootProject.rootDir, '.hooks/pre-commit')
 	into { new File(rootProject.rootDir, '.git/hooks') }
-	fileMode 0775
+	filePermissions {
+		user {
+			read true
+			write true
+			execute true
+		}
+		group {
+			read true
+			write true
+			execute true
+		}
+		other {
+			read true
+			write false
+			execute true
+		}
+	}
 }
 
-build.dependsOn installLocalGitHook
+build {
+	dependsOn installLocalGitHook
+}
 
 spotless {
+	println("Spotless build.gradle")
+	String ref = project.properties["ratchetFrom"]
+	println(ref)
+	if (ref != null) {
+		ref = ref.trim()
+		if (ref.length() > 0) {
+			println("Ratcheting from $ref")
+			ratchetFrom ref
+		}
+	}
 	format 'misc', {
 		// define the files to apply `misc` to
 		target '*.gradle', '.gitattributes', '.gitignore', 'prettierc'
