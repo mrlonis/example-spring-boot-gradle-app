@@ -65,8 +65,47 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+abstract class UpdateSubmoduleExecOperationsTask extends DefaultTask {
+	private ExecOperations execOperations
+
+	@Inject //@javax.inject.Inject
+	UpdateSubmoduleExecOperationsTask(ExecOperations execOperations) {
+		this.execOperations = execOperations
+	}
+
+	@TaskAction
+	void doTaskAction() {
+		execOperations.exec {
+			commandLine 'git', 'submodule', 'update', '--init', '--remote', '--force'
+		}
+	}
+}
+
+
+tasks.register("updateSubmodule", UpdateSubmoduleExecOperationsTask)
+
 tasks.register('installLocalGitHook', Copy) {
 	from new File(rootProject.rootDir, '.hooks/pre-commit')
+	into { new File(rootProject.rootDir, '.git/hooks') }
+	filePermissions {
+		user {
+			read=true
+			write=true
+			execute=true
+		}
+		group {
+			read=true
+			write=true
+			execute=true
+		}
+		other {
+			read=true
+			write=false
+			execute=true
+		}
+	}
+
+	from new File(rootProject.rootDir, '.hooks/post-commit')
 	into { new File(rootProject.rootDir, '.git/hooks') }
 	filePermissions {
 		user {
@@ -88,7 +127,7 @@ tasks.register('installLocalGitHook', Copy) {
 }
 
 build {
-	dependsOn installLocalGitHook
+	dependsOn updateSubmodule, installLocalGitHook, spotlessCheck
 }
 
 spotless {
@@ -100,15 +139,19 @@ spotless {
 		}
 	}
 	format 'misc', {
-		// define the files to apply `misc` to
-		target '*.gradle', '.gitattributes', '.gitignore', 'prettierc'
+		target '*.gradle', '.gitattributes', '.gitignore', 'prettierc', 'gradlew'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'crlf-misc', {
+		target 'gradlew.bat'
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
 	format 'styling', {
 		target '.vscode/**/*.json', 'src/**/*.json', 'src/**/*.yaml', 'src/**/*.yml', 'compose.yml', '.mvn/**/*.xml',
 				'src/**/*.xml'
-		prettier(['prettier': '3.3.2', '@prettier/plugin-xml': '0.10.0'])
+		prettier(['prettier': '^3', '@prettier/plugin-xml': '^3'])
 		.config(['printWidth': 120, 'plugins': ['@prettier/plugin-xml']]).npmInstallCache()
 		trimTrailingWhitespace()
 		endWithNewline()
@@ -131,6 +174,13 @@ spotless {
 	flexmark {
 		target '**/*.md'
 		flexmark()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'styling-sql', {
+		target 'src/**/*.sql'
+		prettier(['prettier': '^3', 'prettier-plugin-sql': '~0.18'])
+		.config(['printWidth': 120, 'plugins': ['prettier-plugin-sql']]).npmInstallCache()
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
