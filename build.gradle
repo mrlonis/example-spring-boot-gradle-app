@@ -65,6 +65,25 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+abstract class UpdateSubmoduleExecOperationsTask extends DefaultTask {
+	private ExecOperations execOperations
+
+	@Inject //@javax.inject.Inject
+	UpdateSubmoduleExecOperationsTask(ExecOperations execOperations) {
+		this.execOperations = execOperations
+	}
+
+	@TaskAction
+	void doTaskAction() {
+		execOperations.exec {
+			commandLine 'git', 'submodule', 'update', '--init', '--remote', '--force'
+		}
+	}
+}
+
+
+tasks.register("updateSubmodule", UpdateSubmoduleExecOperationsTask)
+
 tasks.register('installLocalGitHook', Copy) {
 	from new File(rootProject.rootDir, '.hooks/pre-commit')
 	into { new File(rootProject.rootDir, '.git/hooks') }
@@ -88,8 +107,7 @@ tasks.register('installLocalGitHook', Copy) {
 }
 
 build {
-	dependsOn installLocalGitHook
-	dependsOn spotlessCheck
+	dependsOn updateSubmodule, installLocalGitHook, spotlessCheck
 }
 
 spotless {
