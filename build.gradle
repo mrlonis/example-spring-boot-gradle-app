@@ -104,6 +104,26 @@ tasks.register('installLocalGitHook', Copy) {
 			execute=true
 		}
 	}
+
+	from new File(rootProject.rootDir, '.hooks/post-commit')
+	into { new File(rootProject.rootDir, '.git/hooks') }
+	filePermissions {
+		user {
+			read=true
+			write=true
+			execute=true
+		}
+		group {
+			read=true
+			write=true
+			execute=true
+		}
+		other {
+			read=true
+			write=false
+			execute=true
+		}
+	}
 }
 
 build {
