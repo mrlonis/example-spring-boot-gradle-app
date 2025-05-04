@@ -89,6 +89,7 @@ tasks.register('installLocalGitHook', Copy) {
 
 build {
 	dependsOn installLocalGitHook
+	dependsOn spotlessCheck
 }
 
 spotless {
@@ -100,15 +101,19 @@ spotless {
 		}
 	}
 	format 'misc', {
-		// define the files to apply `misc` to
-		target '*.gradle', '.gitattributes', '.gitignore', 'prettierc'
+		target '*.gradle', '.gitattributes', '.gitignore', 'prettierc', 'gradlew'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'crlf-misc', {
+		target 'gradlew.bat'
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
 	format 'styling', {
 		target '.vscode/**/*.json', 'src/**/*.json', 'src/**/*.yaml', 'src/**/*.yml', 'compose.yml', '.mvn/**/*.xml',
 				'src/**/*.xml'
-		prettier(['prettier': '3.3.2', '@prettier/plugin-xml': '0.10.0'])
+		prettier(['prettier': '^3', '@prettier/plugin-xml': '^3'])
 		.config(['printWidth': 120, 'plugins': ['@prettier/plugin-xml']]).npmInstallCache()
 		trimTrailingWhitespace()
 		endWithNewline()
@@ -131,6 +136,13 @@ spotless {
 	flexmark {
 		target '**/*.md'
 		flexmark()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'styling-sql', {
+		target 'src/**/*.sql'
+		prettier(['prettier': '^3', 'prettier-plugin-sql': '~0.18'])
+		.config(['printWidth': 120, 'plugins': ['prettier-plugin-sql']]).npmInstallCache()
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
