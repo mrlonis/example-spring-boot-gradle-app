@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.7'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id("com.diffplug.spotless") version "8.5.1"
+	id("com.diffplug.spotless") version "8.6.0"
 }
 
 group = 'com.example'
@@ -58,7 +58,7 @@ dependencies {
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mysql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'org.xmlunit:xmlunit-core:2.11.0'
+	testImplementation 'org.xmlunit:xmlunit-core:2.12.0'
 }
 
 tasks.named('test') {
