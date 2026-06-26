@@ -159,9 +159,9 @@ spotless {
 	java {
 		importOrder()
 		removeUnusedImports()
-		cleanthat().version('2.20').sourceCompatibility('21').addMutator('SafeAndConsensual').addMutator(
+		cleanthat().version('2.25').sourceCompatibility('21').addMutator('SafeAndConsensual').addMutator(
 				'SafeButNotConsensual')
-		palantirJavaFormat('2.47.0').style("PALANTIR").formatJavadoc(true)
+		palantirJavaFormat('2.94.0').style("PALANTIR").formatJavadoc(true)
 		formatAnnotations()
 		trimTrailingWhitespace()
 		endWithNewline()
