@@ -150,7 +150,7 @@ spotless {
 	}
 	format 'styling', {
 		target '.vscode/**/*.json', 'src/**/*.json', 'src/**/*.yaml', 'src/**/*.yml', 'compose.yml', '.mvn/**/*.xml',
-				'src/**/*.xml'
+		'src/**/*.xml'
 		prettier(['prettier': '^3', '@prettier/plugin-xml': '^3'])
 		.config(['printWidth': 120, 'plugins': ['@prettier/plugin-xml']]).npmInstallCache()
 		trimTrailingWhitespace()
